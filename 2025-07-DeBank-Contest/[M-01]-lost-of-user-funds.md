@@ -65,17 +65,22 @@ User can lose funds (fee) since there's no fee refund mechanism if swap did not 
 
 
 #### Proof of concept:
-A. Approve feeAmount only
-B. Call swap
-C. Observe feeReceiver gets tokens
+A. Approve feeAmount only.
+
+B. Call swap.
+
+C. Observe feeReceiver gets tokens.
+
 D. Swap reverts before actual execution and user lost feeAmount.
 
 
 
 #### Recommendation: 
-a. Only call `chargeFee()` after ensuring all following steps will succeed.
-b. Collect fromTokenAmount first, then distribute feeAmount and swapAmount internally.
-c. Provide fee refund mechanism that can refund the feeAmount to user whenever the swap failed.
+A. Only call `chargeFee()` after ensuring all following steps will succeed.
+
+B. Collect fromTokenAmount first, then distribute feeAmount and swapAmount internally.
+
+C. Provide fee refund mechanism that can refund the feeAmount to user whenever the swap failed.
 
 
 
