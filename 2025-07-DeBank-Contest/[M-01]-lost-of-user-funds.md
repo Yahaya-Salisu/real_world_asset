@@ -30,7 +30,8 @@ Calling `chargeFee()` before ensuring that if `fromTokenAmount` will be successf
         // deposit to executor
         if (fromToken != UniversalERC20.ETH) {
 
-// This transferFrom may failed, and user will permanently lose his funds (feeAmount).   IERC20(fromToken).safeTransferFrom(msg.sender, address(executor), fromTokenAmount);
+// This transferFrom may failed, and user will permanently lose his funds (feeAmount).
+  IERC20(fromToken).safeTransferFrom(msg.sender, address(executor), fromTokenAmount);
         }
 ```
 
