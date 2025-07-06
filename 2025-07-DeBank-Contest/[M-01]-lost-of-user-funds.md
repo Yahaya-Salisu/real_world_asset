@@ -6,7 +6,7 @@ _Severity:_ Medium
 
 
 
-#### Summary: 
+### Summary: 
 Calling `chargeFee()` before ensuring that if `fromTokenAmount` will be successfully transfered to the executor, can lead to permanent loss of user feeAmount if `transferFrom()` failed after fee deduction.
 
 ```solidity
@@ -36,12 +36,12 @@ Calling `chargeFee()` before ensuring that if `fromTokenAmount` will be successf
 
 
 
-#### Description:
+### Description:
 When performing a token swap, the user is required to approve `fromTokenAmount` to the contract. However, the `swap()` function charges the fee by calling `chargeFee()` before ensuring that the `fromTokenAmount` will be successfully transferred to the executor.
 
 This can lead to a situation where the fee is deducted, but the main `transferFrom()` reverts, leaving the user with reduced balance and no refund mechanism.
 
-Example:
+### Example:
 
 A. User approves $1000 to the contract.
 
@@ -59,12 +59,12 @@ G. User ends up losing $50 with no refund.
 
 
 
-#### Impact:
+### Impact:
 User can lose funds (fee) since there's no fee refund mechanism if swap did not proceed
 
 
 
-#### Proof of concept:
+### Proof of concept:
 A. Approve feeAmount only.
 
 B. Call swap.
@@ -75,7 +75,7 @@ D. Swap reverts before actual execution and user lost feeAmount.
 
 
 
-#### Recommendation: 
+### Recommendation: 
 A. Only call `chargeFee()` after ensuring all following steps will succeed.
 
 B. Collect fromTokenAmount first, then distribute feeAmount and swapAmount internally.
@@ -84,5 +84,5 @@ C. Provide fee refund mechanism that can refund the feeAmount to user whenever t
 
 
 
-#### Tools Used:
+### Tools Used:
 Manual Code review.
