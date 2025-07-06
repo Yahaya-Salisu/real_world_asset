@@ -44,11 +44,17 @@ This can lead to a situation where the fee is deducted, but the main `transferFr
 Example:
 
 A. User approves $1000 to the contract.
+
 B. feeRate = 5%, feeOnFromToken = true (feeAmount = $50).
+
 C. The swap function first deducts $50 as a fee using chargeFee().
+
 D. Remaining balance becomes $950.
+
 E. Then it attempts to transfer $1000 to the executor using `transferFrom()`, and this will fail due to insufficient allowance.
+
 F. The entire swap reverts but the fee was already deducted and sent to the feeReceiver.
+
 G. User ends up losing $50 with no refund.
 
 
@@ -59,10 +65,10 @@ User can lose funds (fee) since there's no fee refund mechanism if swap did not 
 
 
 #### Proof of concept:
-a. Approve feeAmount only
-b. Call swap
-c. Observe feeReceiver gets tokens
-d. Swap reverts before actual execution and user lost feeAmount.
+A. Approve feeAmount only
+B. Call swap
+C. Observe feeReceiver gets tokens
+D. Swap reverts before actual execution and user lost feeAmount.
 
 
 
