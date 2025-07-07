@@ -72,7 +72,7 @@ C. The swap function first deducts $50 as a fee using `_chargeFee()`.
 D. Remaining balance becomes $950.
 
 
-E. If the second transferFrom fails, the entire swap will revert but the fee was already deducted and sent to the feeReceiver.
+E. If the second transferFrom fails or any error happens after fee deduction, the entire swap will revert but the fee was already deducted and sent to the feeReceiver.
 
 F. User ends up losing $50 with no refund.
 
