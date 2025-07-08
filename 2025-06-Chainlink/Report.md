@@ -48,11 +48,17 @@ Attacker can exploit the reward system using less approve amount and high deposi
 
 #### Proof of concept (POC)
 A. User approved = 1.5e20.
+
 B. User calls deposit of = 3e20.
+
 C. Deposit calls `addTotalDeposited()` before external call.
-D. Balance is updated before external call and event was emited
-E. Balance before = 4.5e20
+
+D. Balance is updated before external call and event was emited.
+
+E. Balance before = 4.5e20.
+
 F. Balance after = 7.5e20 (4.5e20 + 3e20).
+
 G. The `transferFrom()` revert but the balance is updated already.
 
 ```solidity
