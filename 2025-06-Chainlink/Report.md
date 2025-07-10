@@ -5,10 +5,10 @@ _Severity_ Medium
 _Source:_ https://github.com/code-423n4/2025-06-chainlink/blob/main/src%2FBUILDClaim.sol#L84-L102
 
 #### Summary:
-The `deposit()` in `BUILDClaim.sol` updates balance before external call, this could lead to a situation where a user can deposit amount more than allowance they approved.
+The `deposit()` in `BUILDClaim.sol` updates balance before external call, this could lead to a situation where a projectAdmin can deposit amount more than allowance they approved.
 
 #### Description:
-User is always required to approve allowance when performing deposit in `BUILClaim.sol` but the deposit always updates balance before external call, meaning that if a user approved 100 tokens, and call deposit of 10,000 tokens, the deposit function will update the balance first before attempting to call `transferFrom()`, after transferFrom() is called the entire deposit will revert with revert reason of 'Insufficient allowance' but the deposit balance was updated already.
+ProjectAdmin is always required to approve allowance when performing deposit in `BUILClaim.sol` but the deposit always updates balance before external call, meaning that if the projectAdmin approved 100 tokens, and call deposit of 10,000 tokens, the deposit function will update the balance first before attempting to call `transferFrom()`, after transferFrom() is called the entire deposit will revert due to  'Insufficient allowance' but the balance was updated already.
 
 ```solidity
 // BULDClaim.sol
@@ -47,19 +47,15 @@ function deposit(
 Attacker can exploit the reward system using less approve amount and high deposit amount, meaning that an attacker will get double benefits (`addTotalDeposited()` is updated and Allowance reverted)
 
 #### Proof of concept (POC)
-A. User approved = 1.5e20.
+A. ProjectAdmin approved = 1.5e20, and calls deposit of = 3e20.
 
-B. User calls deposit of = 3e20.
+B. Deposit calls `addTotalDeposited()` before external call, also balance is updated and event was emited.
 
-C. Deposit calls `addTotalDeposited()` before external call.
+C. Balance before = 4.5e20.
 
-D. Balance is updated before external call and event was emited.
+D. Balance after = 7.5e20 (4.5e20 + 3e20).
 
-E. Balance before = 4.5e20.
-
-F. Balance after = 7.5e20 (4.5e20 + 3e20).
-
-G. The `transferFrom()` revert but the balance is updated already.
+F. The `transferFrom()` revert but the balance is updated already.
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -95,7 +91,7 @@ s_claim.deposit(TOKEN_AMOUNT_P1_S1 * 2); // Call deposit of 3e20 (2× of Allowan
 
 Test suits
 ```solidity
-forge test --match-test submissionValidity
+forge test --match-test submissionValidity -vvvv
 ```
 
 
