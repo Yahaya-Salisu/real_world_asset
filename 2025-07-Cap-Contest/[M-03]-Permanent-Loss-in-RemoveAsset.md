@@ -4,7 +4,7 @@ Yahaya Salisu
 
 _Severity:_ High
 
-_Source:_ reserveLogic.sol#84-91 and validationLogic.sol#
+_Source:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/cap-contracts%2Fcontracts%2FlendingPool%2Flibraries%2FReserveLogic.sol#L84-L91
 
 
 #### Summary:
