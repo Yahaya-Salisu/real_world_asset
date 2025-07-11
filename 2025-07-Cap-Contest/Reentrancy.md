@@ -1,4 +1,4 @@
-[H-02] Reentrancy vulnerability in repay() due to external calls after state changes
+#### [H-02] Reentrancy vulnerability in repay() due to external calls after state changes
 
 Yahaya Salisu
 
