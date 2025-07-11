@@ -13,32 +13,41 @@ The `removeAsset()` function deletes a lending reserve without returning deposit
 
 
 #### Description:
-In the  `Lender.sol` a user that wants to withdraw funds calls `removeAsset()`, and this function verifies the asset to withdraw first, then makes an external call to `ReserveLogic.sol` to perform major actions.
+In the  `Lender.sol` a user that wants to withdraw funds will call `removeAsset()`, and this function verifies the asset to withdraw first, then makes an external call to `ReserveLogic.sol` to perform major actions.
  ```solidity
 // lender.sol
+
    /// @inheritdoc ILender
     function removeAsset(address _asset) external checkAccess(this.removeAsset.selector) {
         if (_asset == address(0)) revert ZeroAddressNotValid();
-        ReserveLogic.removeAsset(getLenderStorage(), _asset);
+       
+// External call 
+ReserveLogic.removeAsset(getLenderStorage(), _asset);
     }
 ```
-And the second `removeAsset()` function in the `ReserveLogic.sol` makes another external calls to `ValidationLogic.sol` after result is returned from `ValidationLogic`, the function will permanently delete all withdrawal data without sending assets to the user or refund it to the protocol.
+
+
+The second `removeAsset()` function in the `ReserveLogic.sol` makes another external calls to the third `removeAsset()` function in the `ValidationLogic.sol`, and after the result of validation is returned from `ValidationLogic.sol`, this second function will permanently delete all withdrawal funds and data without sending assets to the user.
 ```
     /// @notice Remove asset from lending when there is no borrows
     /// @param $ Lender storage
     /// @param _asset Asset address
     function removeAsset(ILender.LenderStorage storage $, address _asset) external {
-// External call 
+
+// Second external call 
         ValidationLogic.validateRemoveAsset($, _asset);
 
         $.reservesList[$.reservesData[_asset].id] = address(0);
-// Permanently deleting reserve data without sending assets to the user
+
+// BUG: ⚠️ Permanently deleting reserve data without sending assets to the user.
         delete $.reservesData[_asset];
 
         emit ReserveAssetRemoved(_asset);
     }
 ```
-The last `removeAsset()` function from the `ValidationLogic.sol` is only checking if a user has unpaid debts, the function does not accrue interests, and it does not check if a user has sufficient balance to withdraw even if he has active debts.
+
+
+The last `removeAsset()` function from the `ValidationLogic.sol` is only checking if a user has unpaid debts, the function does not accrue interests, and it does not check if a user has a sufficient balance to remove even if he has active debts.
 ```solidity
 // validationLogic.sol
 
@@ -51,7 +60,9 @@ The last `removeAsset()` function from the `ValidationLogic.sol` is only checkin
         if (IERC20($.reservesData[_asset].debtToken).totalSupply() != 0) revert VariableDebtSupplyNotZero(); 
     }
 ```
-The worse part of the issue is, wether the user has sufficient balance to remove or he doesn't have, it will always revert as long as he has an active debts, and if the function revert/returned the result to second `removeAsset()` in the `ReserveLogic.sol` This second function will permanently delete all withdrawal funds and data and even the active debts that user is holding, both users and protocol will lose their funds.
+
+
+The worse part of the issue is, wether the user has sufficient balance to remove or he doesn't have, the third function will always revert as long as the user has active debts, and if the function revert/returned the result to the second `removeAsset()` in the `ReserveLogic.sol` This second function will permanently delete all withdrawal funds and data and even the active debts that user is holding, both users and protocol will lose their funds.
 
 
 
