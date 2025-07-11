@@ -68,8 +68,10 @@ This clearly shows that the agent's debt can be paid by anyone because, anyone c
 
 
 #### Proof of concept:
-A. Agent has borrowed 1000 tokens and caller borrowed 2000 tokens
+A. Agent has borrowed 1000 tokens and caller borrowed 2000 tokens.
+
 B. Later the caller wants to repay his debt, but `repay()` updates agent's interest and fetches the balanceOf agent even though the caller is not the agent.
+
 C. The balance of agent cleared while the caller loses their funds.
 
 
@@ -85,7 +87,7 @@ C. The balance of agent cleared while the caller loses their funds.
 #### Recommendation:
 The function should fetch the balanceOf caller whether he is an agent or a caller. Not always balanceOf agent.
 
-```
+```solidity
     function repay(ILender.LenderStorage storage $, ILender.RepayParams memory params)
         external
         returns (uint256 repaid)
