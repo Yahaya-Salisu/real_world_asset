@@ -72,7 +72,7 @@ A. Agent has borrowed 1000 tokens and caller borrowed 2000 tokens.
 
 B. Later the caller wants to repay his debt, but `repay()` updates agent's interest and fetches the balanceOf agent even though the caller is not the agent.
 
-C. The balance of agent cleared while the caller loses their funds.
+C. The balance of agent is cleared and the caller loses their funds.
 
 
 
