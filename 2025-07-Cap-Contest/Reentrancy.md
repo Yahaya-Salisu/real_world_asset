@@ -9,7 +9,7 @@ _Source:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/
 
 
 #### Summary:
-The repay() function makes multiple external calls after updating internal state like reducing `reserve.debt` and `reserve.unrealizedInterest`, because of that if any of these external contracts especially `$.delegation` or `reserve.vault` is malicious or untrusted, they can reenter back into the protocol and perform unauthorized actions.
+The repay() function makes multiple external calls after updating internal state like reducing `reserve.debt` and `reserve.unrealizedInterest`, because of that if any of these external contracts especially `$.delegation` or `reserve.vault` is malicious or untrusted, they can reenter back to the protocol and perform unauthorized actions.
 
 
 
