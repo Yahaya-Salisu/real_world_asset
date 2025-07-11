@@ -71,6 +71,8 @@ Users who deposited to the protocol will lose all their funds during withdrawals
 
 Also, no withdrawal path remains after `removeAsset()`, and a malicious or careless admin can rug-pull the entire reserve, and no validation is done on supplier balance before deletion.
 
+This fund loss is protocol side mistake and even if only admins can call `removeAsset()`, lack of internal validation makes it dangerous, also the losses are permanent and affects all depositors.
+
 
 
 #### Recommendation:
