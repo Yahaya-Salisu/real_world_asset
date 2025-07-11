@@ -1,4 +1,4 @@
-#### [H-03] removeAsset() function leads to permanent loss of funds and interest for depositors
+### [H-03] removeAsset() function leads to permanent loss of funds and interest for depositors
 
 Yahaya Salisu 
 
