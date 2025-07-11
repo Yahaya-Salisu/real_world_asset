@@ -1,4 +1,4 @@
-[M-02] Lack of pause check in `addAsset()` allows asset operations during paused state
+### [M-02] Lack of pause check in addAsset() allows asset operations during paused state
 
 Yahaya Salisu
 
@@ -7,8 +7,10 @@ _Severity:_ Medium
 _Source:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/cap-contracts%2Fcontracts%2FlendingPool%2Flibraries%2FValidationLogic.sol#L98-L106
 
 
+
 #### Summary:
 The protocol introduces a `pauseAsset()` mechanism intended to stop interaction of specific asset during emergency time. `borrow()` function checks paused via `ValidationLogic.validateBorrow()`, but critical function like `addAsset()` does not perform any pause validation, making it possible to call it even when the asset is paused.
+
 
 
 #### Description:
@@ -37,6 +39,7 @@ However, `addAsset()` function calls `validationLogic.validateAddAsset()` but th
         if ($.reservesData[params.asset].vault != address(0)) revert ReserveAlreadyInitialized();
     }
 ```
+
 
 
 #### Impact:
