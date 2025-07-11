@@ -35,7 +35,7 @@ This means the caller (msg.sender) will always repay the debt of the `agent`, ev
 
 
 #### Description:
-Since caller is a msg.sender, the `repay()` function is supposed to realizeRestakerInterest of the caller (msg.sender) and also fetch the balanceOf caller, wether the caller is an agent or not, but instead, it always realizeRestakerInterest of agent and also fetch the balanceOf agent and get repaid  from caller (even though the caller is not the agent ).
+Since the caller is a msg.sender, the `repay()` function is supposed to realizeRestakerInterest of the caller (msg.sender) and also fetch the balanceOf caller, wether the caller is an agent or not, but instead, it always realizeRestakerInterest of agent and also fetch the balanceOf agent and get repaid  from caller (even though the caller is not the agent ).
 
 The issue occurs in `repay()` where the function
 
