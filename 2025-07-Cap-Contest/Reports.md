@@ -11,6 +11,7 @@ The caller will always repay the debt of agent even if he's not the agent becaus
 ```
 
 #### Description:
+```solidity
 `repay()` function is supposed to realizeRestakerInterest of caller and also fetch the balanceOf caller, wether the caller is an agent or a user, but instead, it always realizeRestakerInterest of agent and also fetch the balanceOf agent and get repaid  from caller (even if the caller is not the agent).
 
 ```solidity
