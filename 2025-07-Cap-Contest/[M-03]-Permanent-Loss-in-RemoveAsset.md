@@ -8,7 +8,7 @@ _Source:_ reserveLogic.sol#84-91 and validationLogic.sol#
 
 
 #### Summary:
-The `removeAsset()` function removes a lending reserve without returning deposits or accrued interest to users. This will always cause a permanent loss of funds and breaks the accounting structure of the protocol. Users can not withdraw or earn interest from the protocol, and their history of accounting (debt, unrealized interest, vault data) is silently deleted.
+The `removeAsset()` function deletes a lending reserve without returning deposits or accrued interest to users. This will always cause a permanent loss of funds and breaks the accounting structure of the protocol. Users can not withdraw or earn interest from the protocol, and their history of accounting (debt, unrealized interest, vault data) is silently deleted.
 
 
 
