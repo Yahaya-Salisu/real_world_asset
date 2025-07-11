@@ -1,4 +1,4 @@
-### [M-02] Lack of pause check in addAsset() allows asset operations during paused state
+### [M-02] Missing pause checking in addAsset() allows asset operations during paused state
 
 Yahaya Salisu
 
@@ -9,12 +9,12 @@ _Source:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/
 
 
 #### Summary:
-The protocol introduces a `pauseAsset()` mechanism intended to stop interaction of specific asset during emergency time. `borrow()` function checks paused via `ValidationLogic.validateBorrow()`, but critical function like `addAsset()` does not perform any pause validation, making it possible to call it even when the asset is paused.
+The protocol introduces a `pauseAsset()` mechanism intended to stop interaction of specific asset during emergency time. `borrow()` function checks paused via `ValidationLogic.validateBorrow()`, but critical function like `addAsset()` does not perform any pause checking, making it possible to call it even when the asset is paused.
 
 
 
 #### Description:
-In borrow(), the call to `ValidationLogic.validateBorrow()` checks pause == false, if not it will revert.
+Call to `ValidationLogic.validateBorrow()` In `borrow()` function checks pause status properly.
 ```solidity
     function validateBorrow(ILender.LenderStorage storage $, ILender.BorrowParams memory params) external view {
         if (params.amount < $.reservesData[params.asset].minBorrow) revert MinBorrowAmount();
@@ -28,10 +28,10 @@ In borrow(), the call to `ValidationLogic.validateBorrow()` checks pause == fals
     }
 ```
 
-However, `addAsset()` function calls `validationLogic.validateAddAsset()` but this validation does not check pause status
 
+Also `addAsset()` function calls `validationLogic.validateAddAsset()` but this validation does not check pause status
 ```solidity
-// There's no pause check in validateAddAsset
+// There's no pause check in validateAddAsset at all
     function validateAddAsset(ILender.LenderStorage storage $, ILender.AddAssetParams memory params) external view {
         if (params.asset == address(0) || params.vault == address(0)) revert ZeroAddressNotValid();
         if (params.interestReceiver == address(0)) revert InterestReceiverNotSet();
@@ -43,9 +43,9 @@ However, `addAsset()` function calls `validationLogic.validateAddAsset()` but th
 
 
 #### Impact:
-If the admin pauses an asset using pauseAsset(asset, true), users should not be able to interact with that asset except withdraw or maybe repay in certain emergency situations.
+If the admin pauses an asset using `pauseAsset(asset, true)`, users should not be able to interact with that asset except withdraw or maybe repay in certain emergency situations.
 
-But since there's no pause check, that means any user can still addAsset in a paused asset, and this can lead to an inconsistency in the way assets are managed when paused, and also could open up logic errors, accounting mismatch, or DOS risks.
+But since there's no pause check, that means any user can still `addAsset` in a paused asset, and this can lead to an inconsistency in the way assets are managed when paused, and also could open up logic errors, accounting mismatch, or DOS risks.
 
 
 
@@ -59,7 +59,7 @@ In this case, no revert will occur, meaning that the asset was interacted even t
 
 
 #### Recommendation:
-Make sure validateAddAsset() check pause status or apply modifier design like `onlyWhenNotPaused(asset)` to maintain consistency.
+Make sure `validateAddAsset()` check pause status or apply modifier design like `onlyWhenNotPaused(asset)` to maintain consistency.
 
 ```solidity
     function validateAddAsset(ILender.LenderStorage storage $, ILender.AddAssetParams memory params) external view {
