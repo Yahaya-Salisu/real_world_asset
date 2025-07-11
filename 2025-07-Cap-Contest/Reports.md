@@ -70,6 +70,12 @@ This clearly shows that the agent's debt can be paid by anyone because, anyone c
 
 #### Impact:
 
+A. Any third-party user can repay the debt of any agent, even without permission or relation.
+
+This breaks user isolation and may cause griefing attacks where a malicious actor forcefully repays a user's debt to interfere with their borrowing strategy (e.g. liquidation, farming).
+
+B. Loss of funds from unsuspecting users or automation bots and potential for bribe-style attacks where off-chain agreements exploit the lack of authorization checks.
+
 
 
 #### Proof of concept:
