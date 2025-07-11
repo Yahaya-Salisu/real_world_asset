@@ -36,7 +36,7 @@ The caller will always repay the debt of agent even if he's not the agent becaus
             repaid = agentDebt - reserve.minBorrow;
         }
 
-        @audit-bug--> IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid); // but this transfers repaid amount from any caller (not only agent)
+@audit-bug--> IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid); // but this transfers repaid amount from any caller (not only agent)
 
         uint256 remaining = repaid;
         uint256 interestRepaid;
