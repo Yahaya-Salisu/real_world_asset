@@ -45,7 +45,7 @@ Also `addAsset()` function calls `validationLogic.validateAddAsset()` but this v
 #### Impact:
 If the admin pauses an asset using `pauseAsset(asset, true)`, users should not be able to interact with that asset except withdraw or maybe repay in certain emergency situations.
 
-But since there's no pause check, that means any user can still `addAsset` in a paused asset, and this can lead to an inconsistency in the way assets are managed when paused, and also could open up logic errors, accounting mismatch, or DOS risks.
+But since there's no pause check, that means any user can still `addAsset` in a paused asset, and this undermines the protocol’s pause mechanism, which may be relied on during critical incidents or exploits.
 
 
 
