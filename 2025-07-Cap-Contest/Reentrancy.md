@@ -42,7 +42,7 @@ These external calls after state updates violate the Checks-Effects-Interactions
 
 
 #### Impact:
-An attacker can reenter the protocol after balances have been updated, before the flow completes, and allows unauthorized calls like reentering to repay(), and this may cause manipulation of internal accounting or improper debt forgiveness or draining assets indirectly through repeated calls.
+An attacker can reenter the protocol after balances have been updated, before the flow completes, and allows unauthorized calls like reentering to repay(), and this may cause manipulation of internal accounting or improper debt forgiving or draining assets indirectly through repeated calls.
 
 
 
