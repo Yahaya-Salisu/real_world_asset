@@ -6,12 +6,14 @@ _Severity:_ High
 
 _Source:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/cap-contracts%2Fcontracts%2FlendingPool%2Flibraries%2FBorrowLogic.sol#L99-L127
 
+
+
 #### Summary:
 The caller will always repay the debt of agent even if he's not the agent because `repay() function` realizeRestakerInterest of an agent and it fetches the balanceOf agent everytime, meaning that even if the caller of the `repay()` function is not the agent, the agent's debt will unintentionally be paid by someone.
-```
+
+
 
 #### Description:
-```solidity
 `repay()` function is supposed to realizeRestakerInterest of caller and also fetch the balanceOf caller, wether the caller is an agent or a user, but instead, it always realizeRestakerInterest of agent and also fetch the balanceOf agent and get repaid  from caller (even if the caller is not the agent).
 
 ```solidity
