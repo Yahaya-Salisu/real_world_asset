@@ -51,18 +51,19 @@ The caller will always repay the debt of agent even if he's not the agent becaus
 The issue is occurred here in this logic where `repay()` updates interest of an agent and always fetches the balanceOf agent even if the caller of the `repay()` is not the agent.
 
 ```solidity
-/// Realize restaker interest before repaying
-@audit-bug--> realizeRestakerInterest($, params.agent, params.asset); // This updates the interest of agent 
+// This updates the interest of agent
+@audit-bug--> realizeRestakerInterest($, params.agent, params.asset); 
 
         ILender.ReserveData storage reserve = $.reservesData[params.asset];
 
-        /// Can only repay up to the amount owed
-@audit-bug--> uint256 agentDebt = IERC20(reserve.debtToken).balanceOf(params.agent); // And this always fetches the balanceOf agent
+// And this always fetches the balanceOf agent
+@audit-bug--> uint256 agentDebt = IERC20(reserve.debtToken).balanceOf(params.agent); 
 ```
 Even if the caller of `repay()` is not the agent, the function will clear the agent's debt because the parameters between `balanceOf()` and `transferFrom()` are totally not the same.
 
 ```solidity
-IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid); // This transfers repaid amount from the caller, but it repays the balance of agent.
+// This transfers repaid amount from the caller, but it repays the balance of agent.
+IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid);
 ```
 This clearly shows that the agent's debt can be paid by anyone because, anyone can be a caller but not anyone is an agent.
 
@@ -84,6 +85,9 @@ A. Agent has borrowed 1000 tokens and caller borrowed 2000 tokens.
 B. Later the caller wants to repay his debt, but `repay()` updates agent's interest and fetches the balanceOf agent even though the caller is not the agent.
 
 C. The balance of agent is cleared and the caller loses their funds.
+
+```solidity
+```
 
 
 #### Output:
@@ -123,3 +127,7 @@ The function should fetch the balanceOf caller whether he is an agent or a calle
             remaining -= interestRepaid;
         }
 ```
+
+
+#### Tools Used:
+Manual code review.
