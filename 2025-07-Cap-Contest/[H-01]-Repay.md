@@ -309,7 +309,7 @@ The `repay()` function should address the agent as a msg.sender, exactly like in
         }
 
   // transferFrom should be from agent not msg.sender
-IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid);
+IERC20(params.asset).safeTransferFrom(params.agent, address(this), repaid);
 
         uint256 remaining = repaid;
         uint256 interestRepaid;
