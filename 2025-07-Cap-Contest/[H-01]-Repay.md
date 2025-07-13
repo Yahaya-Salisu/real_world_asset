@@ -1,6 +1,10 @@
-Yahaya Salisu
+#### [H-01] repay() function allows arbitrary third-party to repay on behalf of agent without authorization
 
 _Severity:_ High
+
+_Root Cause:_ https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/cap-contracts%2Fcontracts%2FlendingPool%2Flibraries%2FBorrowLogic.sol#L99-L127
+
+### Summary:
 
 borrowParams in `borrow()` function addressed `agent` as a msg.sender.
 ```solidity
@@ -57,9 +61,6 @@ This allows an arbitrary third party (caller) to repay the debt of any agent, wi
 IERC20(params.asset).safeTransferFrom(params.caller, address(this), repaid);
 ```
 
-### Root Cause
-
-BorrowLogic.sol: https://github.com/sherlock-audit/2025-07-cap-Yahaya-Salisu/blob/main/cap-contracts%2Fcontracts%2FlendingPool%2Flibraries%2FBorrowLogic.sol#L99-L127
 
 ### Internal Pre-conditions
 
@@ -69,9 +70,12 @@ B. Arbitrary user (non-agent) calls `repay()` and the repay agreed and proceeds 
 
 C. The balance of agent is cleared and the caller loses their funds.
 
+
+
 ### External Pre-conditions
 
 _None_
+
 
 ### Attack Path
 
@@ -92,6 +96,8 @@ This breaks user isolation and may cause griefing attacks where a malicious acto
 Loss of funds from unsuspecting users or automation bots and potential for bribe style attacks where off chain agreements exploit the lack of authorization checks.
 
 C. In multi protocol systems, such forced repayment may trigger unexpected cross protocol consequences like unlocking of collateral or loss of farming position.
+
+
 
 ### PoC
 
@@ -117,20 +123,7 @@ contract LenderBorrowTest is TestDeployer {
 
     DebtToken debtToken;
 
-    function setUp() public {
-        _deployCapTestEnvironment();
-        _initTestVaultLiquidity(usdVault);
-        _initSymbioticVaultsLiquidity(env);
-
-        user_agent = _getRandomAgent();
-        caller = _getRandomAgent();
-
-        vm.startPrank(env.symbiotic.users.vault_admin);
-        _symbioticVaultDelegateToAgent(symbioticWethVault, env.symbiotic.networkAdapter, user_agent, 2e18);
-
-        uint256 assetIndex = _getAssetIndex(usdVault, address(usdc));
-        debtToken = DebtToken(usdVault.debtTokens[assetIndex]);
-    }
+... existing code ...
 
     function test_lender_borrow_and_repay() public {
         vm.startPrank(user_agent);
@@ -168,9 +161,7 @@ forge test --match-path LenderBorrowTest.t.sol -vvvv
 Output:
 
 ```solidity
-│   │   │   │   │   │   │   └─ ← [Return] true
-    │   │   │   │   │   │   └─ ← [Return] true
-    │   │   │   │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: agent_1: [0x30eB4Be5Df16b48e660fd697C1ac4322C48204D7], value: 1000000000 [1e9]) 
+├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: agent_1: [0x30eB4Be5Df16b48e660fd697C1ac4322C48204D7], value: 1000000000 [1e9]) 
     │   │   │   │   │   └─ ← [Stop]
     │   │   │   │   └─ ← [Return]
     │   │   │   ├─ emit Borrow(asset: USDC: [0xE74F13d999fb246e2e74DD2CBAd138806Fb6Fec4], agent: agent_1: [0x30eB4Be5Df16b48e660fd697C1ac4322C48204D7], amount: 1000000000 [1e9])
