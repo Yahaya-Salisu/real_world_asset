@@ -1,4 +1,4 @@
-#### [H-01] repay() function allows arbitrary third-party to repay on behalf of agent without authorization
+### [H-01] repay() function allows arbitrary third-party to repay on behalf of agent without authorization
 
 _Severity:_ High
 
