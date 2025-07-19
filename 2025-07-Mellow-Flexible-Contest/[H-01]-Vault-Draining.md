@@ -73,13 +73,17 @@ The burn function also does not check if caller shares balance is enough.
 
 
 ### Impact
-1. Potential total loss of funds in the pool if attacker redeems repeatedly.
+This issue allows a user to redeem more than their actual share balance, leading to potential total protocol drain and complete loss of users funds if attacker redeems repeatedly, and loss of trust in the system's integrity and accounting, and unauthorized extraction of vault assets.
 
-2.Loss of trust in the system's integrity and accounting, and unauthorized extraction of vault assets.
+
+## PoC
+The protocol team forgot to add `RedeemQueue.t.sol` file in the repository, so, the full on-chain PoC is not possible for me.
+
+But, the vulnerability can be triggered by calling `redeem()` with an amount greater than the caller's actual share balance, and the `burn()` function called inside `redeem()` and delegates to `_burnShares()` which is not implemented in this contract, allowing the redemption to succeed without verifying the caller’s balance, and this allows any user to drain funds by repeatedly redeeming more than they own.
 
 
 ### Recommendation:
-Check that the caller owns enough shares before burning
+Make sure to check if the caller owns enough shares before burning
 ```solidity
     /// @inheritdoc IRedeemQueue
     function redeem(uint256 shares) external nonReentrant {
