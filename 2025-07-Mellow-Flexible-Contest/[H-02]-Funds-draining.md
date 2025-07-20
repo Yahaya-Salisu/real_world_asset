@@ -52,6 +52,10 @@ This vulnerability allows a user to redeem more assets than they are allowed to 
 
 
 ### Proof of concept:
+The PoC below shows how a user got signed ordered of 1,000, and the user calls redeem with a `requested > ordered`, but the transaction fails due to InsufficientAsset in the vault.
+
+If the vault has sufficientAsset, the user can redeem requested amount even though `requested > ordered`.
+
 ```solidity
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.25;
