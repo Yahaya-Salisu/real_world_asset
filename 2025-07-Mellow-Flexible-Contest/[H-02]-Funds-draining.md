@@ -147,7 +147,7 @@ forge test --fork-url $(grep ETH_RPC .env | cut -d '=' -f2) --gas-limit 10000000
 ```
 
 Test Output
-![PoC](https://github.com/user-attachments/assets/f9bc1703-a3b6-419e-82b7-b4e27809b55f)
+![PoC output](https://github.com/user-attachments/assets/f9bc1703-a3b6-419e-82b7-b4e27809b55f)
 
 ```bash
 $ forge test --fork-url $(grep ETH_RPC .env | cut -d '=' -f2) --gas-limit 10000000000000000 --fork-block-number 22730425 -vvv --match-path './test/unit/queues/SignatureRedeemQueueTest.t.sol'
