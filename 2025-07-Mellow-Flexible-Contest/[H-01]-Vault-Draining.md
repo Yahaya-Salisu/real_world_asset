@@ -77,6 +77,8 @@ This issue allows a user to redeem more than their actual share balance, leading
 
 
 ## PoC
+The below PoC has demonstrated how a user deposited `1 ether` and later calls redeem of `10 ether`, and the transaction fails because there is no enough balance in the vault, not because the user owns only 1 ether. that means if the vault have enough balance, any user can redeem more shares than their balance.
+
 ```solidity
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.25;
