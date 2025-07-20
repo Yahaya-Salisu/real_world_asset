@@ -8,7 +8,7 @@ _Source:_ https://github.com/sherlock-audit/2025-07-mellow-flexible-vaults-Yahay
 ### Summary
 The `redeem()` function in `signatureRedeemQueue.sol` extents `signatureQueue` to enable instant share redemption from a vault without the usual delay of on-chain oracle processing.
 
-And the function calls `validateOrder()` and both of the functions do not check if the `requested > ordered`, meaning that if a user calls `redeem()` with a requested amount that exceeds ordered amount, the redemption will still proceed even if the `requested > ordered`, this allows users to potentially drain the vaults
+The function calls `validateOrder()` and both of the functions do not check if the `requested > ordered`, meaning that if a user calls `redeem()` with a requested amount that exceeds ordered amount, the redemption will still proceed even if the `requested > ordered`, this allows users to potentially drain the vaults
 
 ```solidity
     function redeem(Order calldata order, IConsensus.Signature[] calldata signatures) external payable nonReentrant {
