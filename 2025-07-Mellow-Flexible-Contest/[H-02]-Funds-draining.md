@@ -1,4 +1,4 @@
-### [H-02] Missing validation of requested amount allows over-redeem of Assets in redeem() function
+### [H-02] Missing validation of requested amount allows over-redeem in redeem() function
 
 _Severity:_ High
 
