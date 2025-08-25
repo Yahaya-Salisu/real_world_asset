@@ -11,4 +11,14 @@ contract FlashUSD is ERC20, Ownable {
         ERC20("flashUSD", "fUSD")
         Ownable(initialOwner)
     {}
+   uint256 public constant EXPIRATION_PERIOD = 7 days;
+
+    struct MintInfo {
+        uint256 amount;
+        uint256 timestamp;
+    }
+
+    mapping(address => MintInfo) public mintInfo;
+
+    function mint() external onlyOwner {}
 }
